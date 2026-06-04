@@ -542,6 +542,7 @@
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="savedPill" class="hidden" style="font-size:11px;opacity:.7;font-family:'DM Mono',monospace;">dados guardados</span>
     <span id="drivePill" class="hidden g-drive-pill"></span>
+    <button id="driveSaveBtn" onclick="forceDriveSave()" class="hidden" style="font-size:12px;padding:5px 12px;border:1.5px solid rgba(255,255,255,0.4);border-radius:6px;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Guardar</button>
     <div id="gUserChip" class="g-user-chip hidden" onclick="gSignOut()">
       <img id="gUserAvatar" class="g-user-avatar" src="" alt=""/>
       <span id="gUserName"></span>
@@ -2231,9 +2232,20 @@ function onGoogleSignIn(credentialResponse) {
   // não usado - usamos redirect flow
 }
 
+async function forceDriveSave() {
+  const btn = document.getElementById('driveSaveBtn');
+  btn.textContent = '⟳ A guardar...';
+  btn.disabled = true;
+  await driveSave();
+  btn.textContent = '✓ Guardado!';
+  setTimeout(() => { btn.textContent = '💾 Guardar'; btn.disabled = false; }, 2000);
+}
+
 function updateSessionUI() {
   const warn = document.getElementById('noSessionWarning');
+  const btn = document.getElementById('driveSaveBtn');
   if (warn) warn.style.display = gAccessToken ? 'none' : 'flex';
+  if (btn) btn.classList.toggle('hidden', !gAccessToken);
 }
 
 function gSignOut() {
