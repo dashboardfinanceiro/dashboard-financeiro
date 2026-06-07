@@ -593,6 +593,18 @@
     </div>
   </div>
 
+  <!-- Resumo de entradas -->
+  <div id="resumoMesChips" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:0.6rem;"></div>
+  <div class="card" style="margin-bottom:1rem;">
+    <p class="card-title">Resumo de entradas por categoria</p>
+    <div class="table-wrap">
+      <table class="resumo-table">
+        <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
+        <tbody id="resumoEntBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Pilares Financeiros -->
   <div class="card" id="pilaresCard" style="margin-bottom:1rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
@@ -601,35 +613,12 @@
     </div>
     <!-- Filtro de mês nos pilares -->
     <div id="pilaresMesChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem;"></div>
-    <!-- Cards dos pilares -->
-    <div id="pilaresCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:0.5rem;"></div>
+    <!-- Cards dos pilares com despesas integradas -->
+    <div id="pilaresCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:0.5rem;align-items:start;"></div>
     <!-- Painel de config -->
     <div id="pilaresConfig" class="hidden" style="border-top:1px solid var(--border);padding-top:1rem;margin-top:0.5rem;">
       <p style="font-size:11px;color:var(--muted);margin-bottom:0.8rem;">Clica numa categoria para a atribuir a um pilar. As que estão num pilar têm × para remover.</p>
       <div id="pilaresConfigGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;"></div>
-    </div>
-  </div>
-
-  <!-- Resumo por categoria -->
-  <div id="resumoMesChips" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:0.6rem;"></div>
-  <div class="resumo-grid">
-    <div class="card">
-      <p class="card-title">Resumo de despesas por categoria</p>
-      <div class="table-wrap">
-        <table class="resumo-table">
-          <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
-          <tbody id="resumoSaiBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="card">
-      <p class="card-title">Resumo de entradas por categoria</p>
-      <div class="table-wrap">
-        <table class="resumo-table">
-          <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
-          <tbody id="resumoEntBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
-        </table>
-      </div>
     </div>
   </div>
 
@@ -1278,11 +1267,33 @@ function renderPilaresCards(data) {
       ? `<div class="pilar-restante ${restante >= 0 ? 'pos' : 'neg'}">${restante >= 0 ? '▼ ' + fmtAbs(restante) + ' disponível' : '▲ ' + fmtAbs(Math.abs(restante)) + ' acima do limite'}</div>`
       : `<div class="pilar-restante" style="color:var(--muted);font-style:italic;">sem limite definido</div>`;
 
+    // Tabela de despesas das categorias deste pilar
+    const catRows = p.cats.map(cat => {
+      const gasto = saiData.filter(r => r.cat === cat).reduce((s, r) => s + Math.abs(r.amount), 0);
+      const n = saiData.filter(r => r.cat === cat).length;
+      const color = CAT_COLORS[CATS.indexOf(cat)] || '#888';
+      const barW = total > 0 ? Math.min((gasto / total) * 100, 100).toFixed(0) : 0;
+      return gasto > 0 || p.cats.includes(cat) ? `
+        <tr>
+          <td style="font-size:12px;padding:5px 0;display:flex;align-items:center;gap:6px;">
+            <span style="width:8px;height:8px;border-radius:2px;background:${color};flex-shrink:0;display:inline-block;"></span>
+            ${cat}
+          </td>
+          <td style="padding:5px 4px;width:50px;">
+            <div style="background:var(--border);border-radius:3px;height:4px;overflow:hidden;">
+              <div style="width:${barW}%;height:4px;border-radius:3px;background:${color};"></div>
+            </div>
+          </td>
+          <td style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;text-align:right;padding:5px 0;">${n}</td>
+          <td style="font-size:12px;font-family:'DM Mono',monospace;text-align:right;padding:5px 0;color:var(--red);">${gasto > 0 ? '-' + fmtAbs(gasto) : '—'}</td>
+        </tr>` : '';
+    }).join('');
+
     return `<div class="pilar-card" style="background:${p.color}15;border:1.5px solid ${p.color}30;">
       <span class="pilar-emoji">${p.emoji}</span>
       <div class="pilar-nome">${p.nome}</div>
       <div class="pilar-total">${fmtAbs(total)}</div>
-      <div class="pilar-sub">${pct}% das saídas${entLabel} · ${p.cats.length} categoria${p.cats.length!==1?'s':''}</div>
+      <div class="pilar-sub">${pct}% das saídas${entLabel}</div>
       <div class="pilar-limite-row">
         <span class="pilar-limite-label">Limite:</span>
         <input class="pilar-limite-input" type="number" min="0" max="100" step="1" value="${limitePct||''}" placeholder="—"
@@ -1291,6 +1302,18 @@ function renderPilaresCards(data) {
       </div>
       <div class="pilar-bar-bg"><div class="pilar-bar-fill" style="width:${barPct}%;background:${barColor};"></div></div>
       ${restHtml}
+      ${p.cats.length > 0 ? `
+      <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid ${p.color}30;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead><tr>
+            <th style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding-bottom:4px;text-align:left;">Categoria</th>
+            <th style="width:50px;"></th>
+            <th style="font-size:10px;color:var(--muted);text-align:right;padding-bottom:4px;">Movs.</th>
+            <th style="font-size:10px;color:var(--muted);text-align:right;padding-bottom:4px;">Total</th>
+          </tr></thead>
+          <tbody>${catRows}</tbody>
+        </table>
+      </div>` : ''}
     </div>`;
   }).join('');
 }
@@ -1508,11 +1531,9 @@ function renderResumoOnly(data, fullData) {
 
 function renderResumo(data) {
   renderResumoMesChips();
-  // Aplica filtro de mês a ambos os resumos
   const resumoData = activeResumoMonth === 'all' ? data : data.filter(r => r.date.slice(0,7) === activeResumoMonth);
-  renderResumoOnly(resumoData, data);
 
-  // Entradas — mesmo filtro de mês
+  // Entradas
   const entCats = {};
   resumoData.filter(r => r.amount > 0).forEach(r => {
     if (!entCats[r.cat]) entCats[r.cat] = { total: 0, n: 0, movs: [] };
@@ -1524,11 +1545,13 @@ function renderResumo(data) {
   const entMax  = entKeys.length ? entCats[entKeys[0]].total : 1;
   const entTotal = entKeys.reduce((s,k) => s + entCats[k].total, 0);
   const entBody = document.getElementById('resumoEntBody');
-  if (!entKeys.length) {
-    entBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem entradas</td></tr>';
-  } else {
-    entBody.innerHTML = buildResumoRows(entCats, entKeys, entMax, false)
-      + `<tr class="total-row"><td colspan="2"><strong>Total</strong></td><td class="n-cell">${resumoData.filter(r=>r.amount>0).length}</td><td class="val-cell pos"><strong>+${fmtAbs(entTotal)}</strong></td></tr>`;
+  if (entBody) {
+    if (!entKeys.length) {
+      entBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem entradas</td></tr>';
+    } else {
+      entBody.innerHTML = buildResumoRows(entCats, entKeys, entMax, false)
+        + `<tr class="total-row"><td colspan="2"><strong>Total</strong></td><td class="n-cell">${resumoData.filter(r=>r.amount>0).length}</td><td class="val-cell pos"><strong>+${fmtAbs(entTotal)}</strong></td></tr>`;
+    }
   }
 }
 
