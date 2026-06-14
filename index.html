@@ -599,8 +599,6 @@
       <p class="card-title" style="margin-bottom:0;">Pilares financeiros</p>
       <button class="btn" onclick="togglePilaresConfig()" id="pilaresConfigBtn" style="font-size:11px;padding:5px 12px;">⚙️ Configurar</button>
     </div>
-    <!-- Filtro de mês nos pilares -->
-    <div id="pilaresMesChips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:1rem;"></div>
     <!-- Cards dos pilares -->
     <div id="pilaresCards" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:0.5rem;"></div>
     <!-- Painel de config -->
@@ -610,26 +608,14 @@
     </div>
   </div>
 
-  <!-- Resumo por categoria -->
-  <div id="resumoMesChips" style="display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:0.6rem;"></div>
-  <div class="resumo-grid">
-    <div class="card">
-      <p class="card-title">Resumo de despesas por categoria</p>
-      <div class="table-wrap">
-        <table class="resumo-table">
-          <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
-          <tbody id="resumoSaiBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
-        </table>
-      </div>
-    </div>
-    <div class="card">
-      <p class="card-title">Resumo de entradas por categoria</p>
-      <div class="table-wrap">
-        <table class="resumo-table">
-          <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
-          <tbody id="resumoEntBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
-        </table>
-      </div>
+  <!-- Resumo de entradas -->
+  <div class="card" style="margin-bottom:1rem;">
+    <p class="card-title">Resumo de entradas por categoria</p>
+    <div class="table-wrap">
+      <table class="resumo-table">
+        <thead><tr><th>Categoria</th><th class="bar-cell"></th><th>Movs.</th><th>Total</th></tr></thead>
+        <tbody id="resumoEntBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem dados</td></tr></tbody>
+      </table>
     </div>
   </div>
 
@@ -1202,11 +1188,8 @@ function setPilarMonth(m) {
 function renderPilares(data) {
   loadPilares();
   const months = [...new Set(allData.map(r => r.date.slice(0,7)))].sort();
-  // Se activePilarMonth é 'all' ou não existe nos meses disponíveis, seleciona o mais recente
-  if (activePilarMonth === 'all' || !months.includes(activePilarMonth)) {
-    activePilarMonth = months[months.length - 1] || 'all';
-  }
-  renderPilaresMesChips(data);
+  // Usar o filtro global — se for 'all', usar o mês mais recente
+  activePilarMonth = activeTableMonth !== 'all' ? activeTableMonth : (months[months.length - 1] || 'all');
   const d = activePilarMonth === 'all' ? allData : allData.filter(r => r.date.slice(0,7) === activePilarMonth);
   renderPilaresCards(d);
 }
@@ -1535,12 +1518,10 @@ function renderResumoOnly(data, fullData) {
 }
 
 function renderResumo(data) {
-  renderResumoMesChips();
-  // Aplica filtro de mês a ambos os resumos
-  const resumoData = activeResumoMonth === 'all' ? data : data.filter(r => r.date.slice(0,7) === activeResumoMonth);
-  renderResumoOnly(resumoData, data);
+  // Usa o mesmo filtro global da página
+  const resumoData = activeTableMonth === 'all' ? data : data.filter(r => r.date.slice(0,7) === activeTableMonth);
 
-  // Entradas — mesmo filtro de mês
+  // Entradas
   const entCats = {};
   resumoData.filter(r => r.amount > 0).forEach(r => {
     if (!entCats[r.cat]) entCats[r.cat] = { total: 0, n: 0, movs: [] };
@@ -1549,14 +1530,16 @@ function renderResumo(data) {
     entCats[r.cat].movs.push(r);
   });
   const entKeys = Object.keys(entCats).sort((a,b) => entCats[b].total - entCats[a].total);
-  const entMax  = entKeys.length ? entCats[entKeys[0]].total : 1;
+  const entMax = entKeys.length ? entCats[entKeys[0]].total : 1;
   const entTotal = entKeys.reduce((s,k) => s + entCats[k].total, 0);
   const entBody = document.getElementById('resumoEntBody');
-  if (!entKeys.length) {
-    entBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem entradas</td></tr>';
-  } else {
-    entBody.innerHTML = buildResumoRows(entCats, entKeys, entMax, false)
-      + `<tr class="total-row"><td colspan="2"><strong>Total</strong></td><td class="n-cell">${resumoData.filter(r=>r.amount>0).length}</td><td class="val-cell pos"><strong>+${fmtAbs(entTotal)}</strong></td></tr>`;
+  if (entBody) {
+    if (!entKeys.length) {
+      entBody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem entradas</td></tr>';
+    } else {
+      entBody.innerHTML = buildResumoRows(entCats, entKeys, entMax, false)
+        + `<tr class="total-row"><td colspan="2"><strong>Total</strong></td><td class="n-cell">${resumoData.filter(r=>r.amount>0).length}</td><td class="val-cell pos"><strong>+${fmtAbs(entTotal)}</strong></td></tr>`;
+    }
   }
 }
 
@@ -1923,6 +1906,11 @@ function renderMonthFilterChips() {
 
 function setMonthFilter(key) {
   activeTableMonth = key;
+  activeResumoMonth = key;
+  activePilarMonth = key === 'all' ? (() => {
+    const months = [...new Set(allData.map(r => r.date.slice(0,7)))].sort();
+    return months[months.length - 1] || 'all';
+  })() : key;
   renderMonthFilterChips();
   refresh();
 }
