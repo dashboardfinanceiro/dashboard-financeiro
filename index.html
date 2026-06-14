@@ -2534,10 +2534,11 @@ async function driveSave() {
     console.log('Drive save: movimentos:', payload.data?.length, 'regras:', payload.rules?.length, 'manual:', payload.data?.filter(r=>r.manual).length);
     const body = JSON.stringify(payload);
     if (gDriveFileId) {
-      await fetch(
+      const rPatch = await fetch(
         `https://www.googleapis.com/upload/drive/v3/files/${gDriveFileId}?uploadType=media`,
         { method:'PATCH', headers:{ Authorization:`Bearer ${gAccessToken}`, 'Content-Type':'application/json' }, body }
       );
+      if (!rPatch.ok) throw new Error('Drive patch failed: ' + rPatch.status);
     } else {
       const meta = JSON.stringify({ name: DRIVE_FILE, parents: ['appDataFolder'] });
       const form = new FormData();
@@ -2547,7 +2548,10 @@ async function driveSave() {
         'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',
         { method:'POST', headers:{ Authorization:`Bearer ${gAccessToken}` }, body:form }
       );
-      gDriveFileId = (await r.json()).id;
+      if (!r.ok) throw new Error('Drive create failed: ' + r.status);
+      const created = await r.json();
+      if (!created.id) throw new Error('Drive create: sem ID no response');
+      gDriveFileId = created.id;
     }
     save(); // cache local também
     setDrivePill('✓ guardado');
