@@ -593,6 +593,11 @@
     </div>
   </div>
 
+  <!-- Filtro de meses -->
+  <div style="margin-bottom:1rem;">
+    <div id="monthFilterChips" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
+  </div>
+
   <!-- Pilares Financeiros -->
   <div class="card" id="pilaresCard" style="margin-bottom:1rem;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
@@ -638,7 +643,6 @@
       <div id="searchResultCount" style="display:none;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:5px;padding-left:2px;"></div>
     </div>
     <div class="filter-row" style="flex-wrap:wrap;gap:6px;">
-      <div id="monthFilterChips" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;"></div>
       <div id="monthFilterSep" class="filter-sep hidden"></div>
       <button class="tab active" data-t="all">Todos</button>
       <button class="tab" data-t="in">Entradas</button>
@@ -2319,10 +2323,6 @@ function handleOAuthCallback() {
   return true;
 }
 
-function onGoogleSignIn(credentialResponse) {
-  // não usado - usamos redirect flow
-}
-
 async function forceDriveSave() {
   const btn = document.getElementById('driveSaveBtn');
   btn.textContent = '⟳ A guardar...';
@@ -2459,7 +2459,7 @@ async function driveSave() {
 
 function scheduleDriveSave() {
   clearTimeout(gSaveTimer);
-  gSaveTimer = setTimeout(driveSave, 1500);
+  gSaveTimer = setTimeout(driveSave, 3000);
 }
 
 // ─── Backup manual (botões) ───────────────────────────────────────────────────
