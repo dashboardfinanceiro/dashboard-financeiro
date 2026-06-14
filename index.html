@@ -1217,7 +1217,11 @@ function toggleCatMovs(id) {
 
 function renderPilaresCards(data) {
   const saiData = data.filter(r => r.amount < 0);
-  const totalSai = saiData.reduce((s, r) => s + Math.abs(r.amount), 0);
+  // Só contar saídas de categorias atribuídas a pilares (as "Sem pilar" são neutras)
+  const catsDePilares = PILARES.flatMap(p => p.cats);
+  const totalSai = saiData
+    .filter(r => catsDePilares.includes(r.cat))
+    .reduce((s, r) => s + Math.abs(r.amount), 0);
   const totalEnt = data.filter(r => r.amount > 0).reduce((s, r) => s + r.amount, 0);
   const baseRendimento = totalEnt > 0 ? totalEnt : budgetRendimento;
   const cardsEl = document.getElementById('pilaresCards');
