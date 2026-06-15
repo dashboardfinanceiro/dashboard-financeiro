@@ -1347,13 +1347,17 @@ function renderPilaresCards(data) {
       const catIdx = CATS.indexOf(cat);
       const color = (typeof CAT_COLORS !== 'undefined' && CAT_COLORS[catIdx]) ? CAT_COLORS[catIdx] : p.color;
       const movsId = 'catMovs_' + p.id + '_' + cat.replace(/\s/g,'_');
-      const movsHtml = catMovs.map(r =>
-        `<tr style="border-top:1px solid var(--border);">
+      const movsHtml = catMovs.map(r => {
+        const isReembolso = r.amount > 0;
+        const cor = isReembolso ? 'var(--green)' : 'var(--red)';
+        const sinal = isReembolso ? '+' : '-';
+        const label = isReembolso ? ' <span style="font-size:9px;background:var(--green);color:#fff;border-radius:3px;padding:1px 4px;vertical-align:middle;">reembolso</span>' : '';
+        return `<tr style="border-top:1px solid var(--border);">
           <td style="padding:4px 8px 4px 24px;font-size:11px;color:var(--muted);">${r.date}</td>
-          <td style="padding:4px 8px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">${r.desc}</td>
-          <td style="padding:4px 8px;font-size:11px;font-family:'DM Mono',monospace;text-align:right;color:var(--red);">-${fmtAbs(Math.abs(r.amount))}</td>
-        </tr>`
-      ).join('');
+          <td style="padding:4px 8px;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px;">${r.desc}${label}</td>
+          <td style="padding:4px 8px;font-size:11px;font-family:'DM Mono',monospace;text-align:right;color:${cor};">${sinal}${fmtAbs(Math.abs(r.amount))}</td>
+        </tr>`;
+      }).join('');
 
       return `
         <tr onclick="toggleCatMovs('${movsId}')" style="cursor:pointer;border-top:1px solid var(--border);">
