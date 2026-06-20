@@ -88,9 +88,9 @@ function renderPilaresResumo(data) {
     const taxaPct = totalRend > 0 ? (totalSai / totalRend * 100) : 0;
     const taxaColor = taxaPct < 80 ? 'var(--green)' : taxaPct <= 100 ? 'var(--accent2)' : taxaPct <= 110 ? 'var(--red)' : 'var(--red-dark)';
     return `<div class="kpi">
-      <div class="kpi-label" style="display:flex;align-items:center;">Taxa de Consumo
+      <div class="kpi-label" style="display:flex;align-items:center;">Taxa de Alocação
         <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
-          <strong>% do rendimento já alocada aos pilares.</strong>
+          <strong>% do rendimento já alocada aos pilares (gastos + poupança/investimento).</strong>
           <div class="tip-row"><span><span class="tip-dot" style="background:var(--green);"></span>&lt; 80%</span><span>Saudável</span></div>
           <div class="tip-row"><span><span class="tip-dot" style="background:var(--accent2);"></span>80–100%</span><span>Equilibrado</span></div>
           <div class="tip-row"><span><span class="tip-dot" style="background:var(--red);"></span>100–110%</span><span>No limite</span></div>
@@ -126,7 +126,7 @@ function renderTable(data) {
     const msg = State.activeSearch
       ? `Sem resultados para "<strong>${State.activeSearch}</strong>"`
       : 'Sem movimentos para este filtro.';
-    body.innerHTML = `<tr><td colspan="4"><div class="empty-state">${msg}</div></td></tr>`;
+    body.innerHTML = `<tr><td colspan="5"><div class="empty-state">${msg}</div></td></tr>`;
     return;
   }
   const hl = (text) => {
@@ -144,9 +144,60 @@ function renderTable(data) {
         ${State.CATS.map(c => `<option value="${c}" ${c === r.cat ? 'selected' : ''}>${c}</option>`).join('')}
       </select></td>
       <td class="amt-cell ${r.amount > 0 ? 'pos' : 'neg'}">${fmt(r.amount)}</td>
+      <td style="width:34px;text-align:center;">
+        <button onclick="window._deleteMov(${globalIdx})" title="Apagar movimento"
+          style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;line-height:1;padding:2px 4px;"
+          onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted)'">🗑</button>
+      </td>
     </tr>`;
   }).join('');
 }
+
+window._deleteMov = function(idx) {
+  const r = State.allData[idx];
+  if (!r) return;
+  const dateDisp = r.date.slice(8,10) + '/' + r.date.slice(5,7) + '/' + r.date.slice(0,4);
+  if (!confirm(`Apagar este movimento?\n\n${dateDisp} — ${r.desc} — ${fmt(r.amount)}\n\nEsta ação não pode ser desfeita.`)) return;
+  State.allData.splice(idx, 1);
+  Storage.save();
+  if (Storage.gAccessToken) Storage.scheduleDriveSave();
+  refresh();
+};
+
+window._toggleAddMov = function() {
+  const panel = document.getElementById('addMovPanel');
+  const isHidden = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden');
+  if (isHidden) {
+    refreshCatSelects();
+    const todayISO = new Date().toISOString().slice(0, 10);
+    document.getElementById('addMovDate').value = todayISO;
+    document.getElementById('addMovDesc').value = '';
+    document.getElementById('addMovValor').value = '';
+  }
+};
+
+window._addManualMov = function() {
+  const dateEl = document.getElementById('addMovDate');
+  const descEl = document.getElementById('addMovDesc');
+  const valorEl = document.getElementById('addMovValor');
+  const catEl = document.getElementById('addMovCat');
+
+  const date = dateEl.value;
+  const desc = descEl.value.trim();
+  const amount = parseFloat(valorEl.value);
+  const cat = catEl.value;
+
+  if (!date) { alert('Indica uma data.'); dateEl.focus(); return; }
+  if (!desc) { alert('Indica uma descrição.'); descEl.focus(); return; }
+  if (isNaN(amount) || amount === 0) { alert('Indica um valor diferente de zero (positivo para entrada, negativo para saída).'); valorEl.focus(); return; }
+
+  State.allData.push({ date, desc, amount, cat, manual: true, manualOnly: true });
+  Storage.save();
+  if (Storage.gAccessToken) Storage.scheduleDriveSave();
+  window._toggleAddMov();
+  refresh();
+};
 
 window._changecat = function(sel, idx) {
   State.allData[idx].cat = sel.value;
@@ -382,6 +433,12 @@ function refreshCatSelects() {
     ruleCatEl.innerHTML = State.CATS.map(c => `<option value="${c}">${c}</option>`).join('')
       + `<option value="__new__" style="color:var(--blue);font-style:italic;">+ Nova categoria...</option>`;
     if ([...ruleCatEl.options].some(o => o.value === cur)) ruleCatEl.value = cur;
+  }
+  const addMovCatEl = document.getElementById('addMovCat');
+  if (addMovCatEl) {
+    const cur = addMovCatEl.value;
+    addMovCatEl.innerHTML = State.CATS.map(c => `<option value="${c}">${c}</option>`).join('');
+    if ([...addMovCatEl.options].some(o => o.value === cur)) addMovCatEl.value = cur;
   }
   document.querySelectorAll('.cat-sel').forEach(sel => {
     const cur = sel.value;
@@ -784,7 +841,7 @@ function doReset() {
   document.getElementById('monthsList').classList.add('hidden');
   document.getElementById('monthsChips').innerHTML = '';
   const mfc = document.getElementById('monthFilterChips'); if (mfc) mfc.innerHTML = '';
-  document.getElementById('movBody').innerHTML = '<tr><td colspan="4"><div class="empty-state">Sem dados<p>Carrega um extrato CSV ou usa o demo.</p></div></td></tr>';
+  document.getElementById('movBody').innerHTML = '<tr><td colspan="5"><div class="empty-state">Sem dados<p>Carrega um extrato CSV ou usa o demo.</p></div></td></tr>';
   if (State.chartPilares) { State.chartPilares.destroy(); State.setChartPilares(null); }
   document.getElementById('fileInput').value = '';
 }
@@ -801,9 +858,14 @@ function handleFile(file, isLast, onDone) {
     Object.assign(State.metaInfo, meta);
     const monthsInFile = [...new Set(rows.map(r => r.date.slice(0,7)))].sort();
     const manualEdits  = {};
+    const manualOnlyRows = []; // linhas manuais que não vieram de nenhum CSV (criadas à mão) — preservam-se sempre
     monthsInFile.forEach(m => {
       State.allData.filter(r => r.date.slice(0,7)===m && r.manual)
-        .forEach(r => { manualEdits[r.date+'|'+r.desc+'|'+r.amount] = r.cat; });
+        .forEach(r => {
+          const key = r.date+'|'+r.desc+'|'+r.amount;
+          manualEdits[key] = r.cat;
+          if (r.manualOnly) manualOnlyRows.push(r);
+        });
     });
     monthsInFile.forEach(m => {
       State.setAllData(State.allData.filter(r => r.date.slice(0,7) !== m));
@@ -813,9 +875,9 @@ function handleFile(file, isLast, onDone) {
       const key = r.date+'|'+r.desc+'|'+r.amount;
       if (manualEdits[key] !== undefined) { r.cat = manualEdits[key]; r.manual = true; }
     });
-    State.setAllData(State.allData.concat(rows));
+    State.setAllData(State.allData.concat(rows).concat(manualOnlyRows));
     monthsInFile.forEach(m => {
-      const count = rows.filter(r => r.date.slice(0,7)===m).length;
+      const count = rows.filter(r => r.date.slice(0,7)===m).length + manualOnlyRows.filter(r => r.date.slice(0,7)===m).length;
       const [y, mo] = m.split('-');
       const nomeMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][parseInt(mo)-1];
       State.loadedMonths.push({ key: m, label: nomeMes+' '+y, count });
@@ -874,6 +936,8 @@ window._gSignOut    = () => Storage.gSignOut({ updateSessionUI: Storage.updateSe
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
+  refreshCatSelects();
+
   // Tabs tipo
   document.querySelectorAll('.tab[data-t]').forEach(btn => {
     btn.addEventListener('click', () => {
