@@ -407,8 +407,7 @@ window._deleteCategory = function(cat) {
   if (!State.CUSTOM_CATS.includes(cat)) { if (!State.DELETED_BASE_CATS.includes(cat)) State.DELETED_BASE_CATS.push(cat); }
   State.setCustomCats(State.CUSTOM_CATS.filter(c => c !== cat));
   State.PILARES.forEach(p => { p.cats = p.cats.filter(c => c !== cat); });
-  delete State.budgetLimits[cat];
-  Storage.savePilares(); Storage.saveRules(); Storage.saveBudget(); Storage.save();
+  Storage.savePilares(); Storage.saveRules(); Storage.save();
   if (Storage.gAccessToken) Storage.scheduleDriveSave();
   refreshCatSelects(); renderRulesList(); renderCatChips(); refresh();
 };
@@ -480,142 +479,6 @@ window._togglePilaresConfig = function() {
   else { cfg.classList.add('hidden'); btn.textContent='⚙️ Configurar'; }
 };
 
-// ─── Budget ───────────────────────────────────────────────────────────────────
-function getRendimentoEfetivo() {
-  const filtered = getFilteredData();
-  const total = filtered.filter(r => r.amount > 0 && r.cat === 'Rendimentos').reduce((s,r) => s+r.amount, 0);
-  return total > 0 ? total : State.budgetRendimento;
-}
-
-function updateRendimentoLabel() {
-  const el = document.getElementById('rendimentoEfetivoLabel');
-  if (!el) return;
-  const rend = getRendimentoEfetivo();
-  el.textContent = rend > 0 ? fmt(rend).replace('+','') + ' €' : '—';
-}
-
-function updateBudgetOverview() {
-  const strat = State.STRATEGIES[State.activeStrategy];
-  const rend  = getRendimentoEfetivo();
-  updateRendimentoLabel();
-  const ovEl = document.getElementById('budgetOverview');
-  if (!ovEl) return;
-  if (!strat.groups || !rend) { ovEl.style.display='none'; return; }
-  ovEl.style.display = 'grid';
-  const filtered = getFilteredData();
-  const gastos = { necessidades: 0, desejos: 0, poupanca: 0 };
-  filtered.filter(r => r.amount < 0 && r.cat !== 'Transferências').forEach(r => {
-    const pilar = State.CAT_PILAR[r.cat] || 'desejos';
-    if (pilar) gastos[pilar] += Math.abs(r.amount);
-  });
-  [{ id:'Necessidades', key:'necessidades' }, { id:'Desejos', key:'desejos' }, { id:'Poupanca', key:'poupanca' }].forEach(({id,key}) => {
-    const limite = rend * (strat.groups[key] || 0);
-    const gasto  = gastos[key];
-    const pct    = strat.groups[key] * 100;
-    const valEl  = document.getElementById('ov'+id);
-    const subEl  = document.getElementById('ov'+id+'Pct');
-    if (valEl) {
-      const restante = limite - gasto;
-      valEl.textContent = (restante>=0?'+':'')+restante.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' €';
-      valEl.className = 'budget-overview-val ' + (restante>=0 ? 'pos' : 'neg');
-    }
-    if (subEl) subEl.textContent = pct+'% do rendimento · '+fmt(limite).replace('+','')+' limite';
-  });
-}
-
-function renderBudgetCats() {
-  const grid = document.getElementById('budgetCatsGrid');
-  if (!grid) return;
-  const filtered = getFilteredData();
-  const gastosCat = {};
-  filtered.filter(r => r.amount < 0).forEach(r => { gastosCat[r.cat] = (gastosCat[r.cat]||0) + Math.abs(r.amount); });
-  grid.innerHTML = State.CATS.filter(c => c !== 'Rendimentos').map(cat => {
-    const color    = State.CAT_COLORS[State.CATS.indexOf(cat)] || '#888';
-    const limite   = State.budgetLimits[cat] || 0;
-    const gasto    = gastosCat[cat] || 0;
-    const pct      = limite > 0 ? Math.min((gasto/limite)*100, 100) : 0;
-    const over     = gasto > limite && limite > 0;
-    const barColor = over ? 'var(--red)' : (pct > 80 ? 'var(--gold)' : color);
-    const restante = limite - gasto;
-    let status = '';
-    if (limite > 0) {
-      if (over)      status = `<span class="neg">▲ ${Math.abs(restante).toFixed(2).replace('.',',')} € acima</span>`;
-      else if (pct>=80) status = `<span style="color:var(--gold)">⚠ ${restante.toFixed(2).replace('.',',')} € restantes</span>`;
-      else           status = `<span class="pos">✓ ${restante.toFixed(2).replace('.',',')} € restantes</span>`;
-    } else {
-      status = gasto > 0
-        ? `<span style="color:var(--muted)">${gasto.toFixed(2).replace('.',',')} € gastos · sem limite</span>`
-        : `<span style="color:var(--muted)">sem limite definido</span>`;
-    }
-    return `<div class="budget-cat-item">
-      <div class="budget-cat-header">
-        <span class="budget-cat-name"><span class="budget-cat-dot" style="background:${color};"></span>${cat}</span>
-        <div class="budget-input-wrap">
-          <input type="number" class="budget-input" data-cat="${cat}" value="${limite||''}" placeholder="—" min="0" step="10"
-            oninput="window._onBudgetCatInput(this)" onchange="window._saveBudgetUI()"/>
-          <span class="budget-input-sym">€</span>
-        </div>
-      </div>
-      <div class="budget-bar-wrap"><div class="budget-bar-fill" style="width:${pct}%;background:${barColor};"></div></div>
-      <div class="budget-status">${status}</div>
-    </div>`;
-  }).join('');
-}
-
-window._onBudgetCatInput = function(input) {
-  State.budgetLimits[input.dataset.cat] = parseFloat(input.value) || 0;
-  State.setActiveStrategy('custom');
-  document.querySelectorAll('.budget-strategy-tab').forEach(t => t.classList.toggle('active', t.dataset.strategy==='custom'));
-  window._saveBudgetUI();
-};
-
-window._saveBudgetUI = function() {
-  Storage.saveBudget();
-  renderBudgetCats();
-  updateBudgetOverview();
-};
-
-window._toggleBudget = function() {
-  const p = document.getElementById('budgetPainel');
-  const btn = document.getElementById('budgetToggleBtn');
-  const hidden = p.classList.toggle('hidden');
-  btn.textContent = hidden ? 'Mostrar objetivos' : 'Esconder objetivos';
-  if (!hidden) renderBudgetCats();
-};
-
-window._applyStrategy = function(strategy) {
-  State.setActiveStrategy(strategy);
-  document.querySelectorAll('.budget-strategy-tab').forEach(t => t.classList.toggle('active', t.dataset.strategy===strategy));
-  const desc = document.getElementById('budgetStrategyDesc');
-  if (desc) desc.textContent = State.STRATEGIES[strategy]?.label || '';
-  const rend  = State.budgetRendimento;
-  const strat = State.STRATEGIES[strategy];
-  if (strat.groups && rend > 0) {
-    State.CATS.forEach(cat => {
-      if (cat === 'Rendimentos') return;
-      const pilar = State.CAT_PILAR[cat] || 'desejos';
-      const pct   = strat.groups[pilar] || 0;
-      const catsNoPilar = State.CATS.filter(c => (State.CAT_PILAR[c]||'desejos')===pilar && c!=='Rendimentos');
-      State.budgetLimits[cat] = Math.round((rend*pct)/catsNoPilar.length);
-    });
-  }
-  window._saveBudgetUI();
-};
-
-window._onBudgetRendimentoChange = function() {
-  State.setBudgetRendimento(parseFloat(document.getElementById('budgetRendimento').value) || 0);
-  updateBudgetOverview();
-};
-
-window._usarEntradasComoRendimento = function() {
-  const filtered  = getFilteredData();
-  const total = filtered.filter(r => r.amount > 0 && r.cat !== 'Transferências').reduce((s,r) => s+r.amount, 0);
-  if (!total) { alert('Sem entradas no período atual.'); return; }
-  State.setBudgetRendimento(Math.round(total));
-  document.getElementById('budgetRendimento').value = State.budgetRendimento;
-  window._saveBudgetUI(); updateBudgetOverview();
-};
-
 // ─── Meses UI ─────────────────────────────────────────────────────────────────
 function renderMonthFilterChips() {
   const el  = document.getElementById('monthFilterChips');
@@ -670,10 +533,6 @@ function refresh() {
   renderPilares(f);
   renderResumo(f);
   renderTable(f);
-  const budgetPainel = document.getElementById('budgetPainel');
-  if (budgetPainel && !budgetPainel.classList.contains('hidden')) {
-    updateRendimentoLabel(); renderBudgetCats(); updateBudgetOverview();
-  }
 }
 
 function showDash(label, detail, isBankFmt) {
@@ -886,7 +745,6 @@ window.addEventListener('load', () => {
         Storage.loadRules();
         refreshCatSelects();
         renderRulesList();
-        Storage.loadBudget();
         Storage.driveLoad(uiCallbacks).then(() => {
           updateMonthsUI();
         });
