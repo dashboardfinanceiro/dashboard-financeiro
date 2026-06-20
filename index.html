@@ -124,48 +124,6 @@
     </div>
   </div>
 
-  <!-- Orçamento / Objetivos -->
-  <div class="card" id="budgetCard" style="margin-bottom:1rem;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px;">
-      <p class="card-title" style="margin-bottom:0;">🎯 Objetivos de orçamento</p>
-      <button class="btn" onclick="window._toggleBudget()" id="budgetToggleBtn">Mostrar objetivos</button>
-    </div>
-    <div id="budgetPainel" class="hidden">
-      <div class="budget-rendimento-wrap">
-        <span class="budget-rendimento-label">Rendimento mensal (efetivo: <span id="rendimentoEfetivoLabel">—</span>)</span>
-        <input type="number" id="budgetRendimento" placeholder="ex: 1800" min="0" step="50"
-          oninput="window._onBudgetRendimentoChange()" onchange="window._saveBudgetUI()"
-          style="width:110px;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-family:'DM Mono',monospace;font-size:13px;background:var(--surface);"/>
-        <button class="btn" style="font-size:11px;padding:5px 10px;" onclick="window._usarEntradasComoRendimento()">Usar entradas do período</button>
-      </div>
-      <div class="budget-strategy-tabs">
-        <button class="budget-strategy-tab active" data-strategy="custom" onclick="window._applyStrategy('custom')">Livre</button>
-        <button class="budget-strategy-tab" data-strategy="503020" onclick="window._applyStrategy('503020')">50/30/20</button>
-        <button class="budget-strategy-tab" data-strategy="602020" onclick="window._applyStrategy('602020')">60/20/20</button>
-        <button class="budget-strategy-tab" data-strategy="702010" onclick="window._applyStrategy('702010')">70/20/10</button>
-        <button class="budget-strategy-tab" data-strategy="zero" onclick="window._applyStrategy('zero')">Base zero</button>
-      </div>
-      <p id="budgetStrategyDesc" style="font-size:11px;color:var(--muted);margin-bottom:1rem;">Define livremente o limite de cada categoria.</p>
-      <div class="budget-overview" id="budgetOverview" style="display:none;">
-        <div class="budget-overview-item">
-          <div class="budget-overview-label">Necessidades</div>
-          <div class="budget-overview-val" id="ovNecessidades">—</div>
-          <div class="budget-overview-sub" id="ovNecessidadesPct"></div>
-        </div>
-        <div class="budget-overview-item">
-          <div class="budget-overview-label">Desejos</div>
-          <div class="budget-overview-val" id="ovDesejos">—</div>
-          <div class="budget-overview-sub" id="ovDesejosPct"></div>
-        </div>
-        <div class="budget-overview-item">
-          <div class="budget-overview-label">Poupança</div>
-          <div class="budget-overview-val" id="ovPoupanca">—</div>
-          <div class="budget-overview-sub" id="ovPoupancaPct"></div>
-        </div>
-      </div>
-      <div class="budget-cats-grid" id="budgetCatsGrid"></div>
-    </div>
-  </div>
 
   <!-- Resumo de entradas -->
   <div class="card" style="margin-bottom:1rem;">
