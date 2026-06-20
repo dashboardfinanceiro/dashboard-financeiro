@@ -176,11 +176,38 @@
       </div>
       <div id="searchResultCount" style="display:none;font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:5px;padding-left:2px;"></div>
     </div>
-    <div class="filter-row" style="flex-wrap:wrap;gap:6px;">
+    <div class="filter-row" style="flex-wrap:wrap;gap:6px;align-items:center;">
       <div id="monthFilterSep" class="filter-sep hidden"></div>
       <button class="tab active" data-t="all">Todos</button>
       <button class="tab" data-t="in">Entradas</button>
       <button class="tab" data-t="out">Saídas</button>
+      <div style="margin-left:auto;display:flex;align-items:center;">
+        <button class="btn" style="font-size:12px;padding:6px 12px;" onclick="window._toggleAddMov()" id="addMovToggleBtn">+ Adicionar movimento</button>
+        <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
+          Cria uma linha manual no extrato — útil para corrigir situações que o extrato do banco não reflete bem, como um reembolso que cobre despesas de meses diferentes. Usa valor positivo para entradas e negativo para saídas.
+        </span></span>
+      </div>
+    </div>
+    <div id="addMovPanel" class="hidden" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Data</label>
+        <input id="addMovDate" type="date" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);"/>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;flex:2;min-width:160px;">
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Descrição</label>
+        <input id="addMovDesc" type="text" placeholder="Ex: Reembolso pai (parte maio)" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);"/>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Valor (€)</label>
+        <input id="addMovValor" type="number" step="0.01" placeholder="-50,00" style="width:110px;padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);"/>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <label style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Categoria</label>
+        <select id="addMovCat" style="padding:7px 10px;border:1px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);"></select>
+      </div>
+      <button class="btn btn-accent" onclick="window._addManualMov()" style="font-size:12px;padding:8px 14px;">Adicionar</button>
+      <button class="btn" onclick="window._toggleAddMov()" style="font-size:12px;padding:8px 14px;">Cancelar</button>
+      <p style="width:100%;font-size:11px;color:var(--muted);margin-top:2px;">💡 Valor positivo = entrada · valor negativo = saída (ex: -500 para uma despesa de 500€)</p>
     </div>
     <div class="table-wrap">
       <table>
@@ -190,10 +217,15 @@
             <th>Descrição</th>
             <th style="width:160px">Categoria</th>
             <th style="width:100px;text-align:right">Valor</th>
+            <th style="width:34px;text-align:center;">
+              <span class="info-tip" tabindex="0" style="margin-left:0;">i<span class="info-tip-bubble" style="left:auto;right:0;transform:none;">
+                Apaga este movimento da tabela. Útil para remover lançamentos duplicados ou incorretos. Não pode ser desfeito.
+              </span></span>
+            </th>
           </tr>
         </thead>
         <tbody id="movBody">
-          <tr><td colspan="4"><div class="empty-state">Sem dados<p>Carrega um extrato CSV ou usa o demo.</p></div></td></tr>
+          <tr><td colspan="5"><div class="empty-state">Sem dados<p>Carrega um extrato CSV ou usa o demo.</p></div></td></tr>
         </tbody>
       </table>
     </div>
