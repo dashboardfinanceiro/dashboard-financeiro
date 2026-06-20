@@ -523,8 +523,9 @@ tr:hover td { background: var(--surface2); }
   width: 14px;
   height: 14px;
   border-radius: 50%;
+  background: var(--muted);
   border: 1px solid var(--muted);
-  color: var(--muted);
+  color: #fff;
   font-size: 10px;
   font-family: 'DM Mono', monospace;
   cursor: help;
@@ -533,8 +534,9 @@ tr:hover td { background: var(--surface2); }
   user-select: none;
 }
 .info-tip.info-tip-blue {
+  background: var(--blue) !important;
   border-color: var(--blue) !important;
-  color: var(--blue) !important;
+  color: #fff !important;
 }
 .info-tip .info-tip-bubble {
   display: none;
