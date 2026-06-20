@@ -533,8 +533,8 @@ tr:hover td { background: var(--surface2); }
   user-select: none;
 }
 .info-tip.info-tip-blue {
-  border-color: var(--blue);
-  color: var(--blue);
+  border-color: var(--blue) !important;
+  color: var(--blue) !important;
 }
 .info-tip .info-tip-bubble {
   display: none;
