@@ -83,11 +83,23 @@ function renderPilaresResumo(data) {
       <div class="kpi-val neu" style="color:${p.color};">${pct}%</div>
       <div class="kpi-sub">do rendimento</div>
     </div>`;
-  }).join('') + `<div class="kpi">
-      <div class="kpi-label">Taxa de Consumo</div>
-      <div class="kpi-val neu">${(totalRend > 0 ? (totalSai / totalRend * 100).toFixed(1) : '0.0')}%</div>
+  }).join('') + (() => {
+    const taxaPct = totalRend > 0 ? (totalSai / totalRend * 100) : 0;
+    const taxaColor = taxaPct < 80 ? 'var(--green)' : taxaPct <= 100 ? 'var(--gold)' : taxaPct <= 110 ? 'var(--accent2)' : 'var(--red)';
+    return `<div class="kpi">
+      <div class="kpi-label" style="display:flex;align-items:center;">Taxa de Consumo
+        <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
+          <strong>% do rendimento já alocada aos pilares.</strong>
+          <div class="tip-row"><span><span class="tip-dot" style="background:var(--green);"></span>&lt; 80%</span><span>Saudável</span></div>
+          <div class="tip-row"><span><span class="tip-dot" style="background:var(--gold);"></span>80–100%</span><span>Equilibrado</span></div>
+          <div class="tip-row"><span><span class="tip-dot" style="background:var(--accent2);"></span>100–110%</span><span>No limite</span></div>
+          <div class="tip-row"><span><span class="tip-dot" style="background:var(--red);"></span>&gt; 110%</span><span>Alerta</span></div>
+        </span></span>
+      </div>
+      <div class="kpi-val neu" style="color:${taxaColor};">${taxaPct.toFixed(1)}%</div>
       <div class="kpi-sub">${fmtAbs(totalSai)} alocados</div>
     </div>`;
+  })();
 
   // Linha % das saídas + valor €
   elSai.classList.remove('hidden');
