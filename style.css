@@ -523,8 +523,8 @@ tr:hover td { background: var(--surface2); }
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--muted);
-  border: 1px solid var(--muted);
+  background: var(--blue);
+  border: 1px solid var(--blue);
   color: #fff;
   font-size: 10px;
   font-family: 'DM Mono', monospace;
