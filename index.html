@@ -184,7 +184,8 @@
       <div style="margin-left:auto;display:flex;align-items:center;">
         <button class="btn" style="font-size:12px;padding:6px 12px;" onclick="window._toggleAddMov()" id="addMovToggleBtn">+ Adicionar movimento</button>
         <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
-          Cria uma linha manual no extrato — útil para corrigir situações que o extrato do banco não reflete bem, como um reembolso que cobre despesas de meses diferentes. Usa valor positivo para entradas e negativo para saídas.
+          <strong>+ Adicionar movimento</strong> — cria uma linha manual, útil para corrigir situações que o extrato do banco não reflete bem (ex: um reembolso que cobre despesas de meses diferentes). Valor positivo = entrada, negativo = saída.<br/><br/>
+          <strong>🗑 na tabela</strong> — apaga esse movimento. Não pode ser desfeito.
         </span></span>
       </div>
     </div>
@@ -217,11 +218,7 @@
             <th>Descrição</th>
             <th style="width:160px">Categoria</th>
             <th style="width:100px;text-align:right">Valor</th>
-            <th style="width:34px;text-align:center;">
-              <span class="info-tip" tabindex="0" style="margin-left:0;">i<span class="info-tip-bubble" style="left:auto;right:0;transform:none;">
-                Apaga este movimento da tabela. Útil para remover lançamentos duplicados ou incorretos. Não pode ser desfeito.
-              </span></span>
-            </th>
+            <th style="width:34px"></th>
           </tr>
         </thead>
         <tbody id="movBody">
