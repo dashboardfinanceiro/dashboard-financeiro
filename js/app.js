@@ -174,12 +174,14 @@ function renderPilaresCards(data) {
   };
   const catsDePilares = State.PILARES.flatMap(p => p.cats);
   const totalSai = catsDePilares.reduce((s, cat) => s + gastoLiquidoCat(cat), 0);
+  const totalRend = data.filter(r => r.amount > 0 && r.cat === 'Rendimentos').reduce((s, r) => s + r.amount, 0);
   const cardsEl  = document.getElementById('pilaresCards');
   if (!cardsEl) return;
 
   cardsEl.innerHTML = State.PILARES.map(p => {
     const total    = p.cats.reduce((s, cat) => s + gastoLiquidoCat(cat), 0);
     const pctPilar = totalSai > 0 ? (total / totalSai * 100).toFixed(1) : '0.0';
+    const pctRend  = totalRend > 0 ? (total / totalRend * 100).toFixed(1) : '0.0';
     const catRows  = p.cats.map(cat => {
       const gasto = gastoLiquidoCat(cat);
       if (gasto === 0) return '';
@@ -221,7 +223,10 @@ function renderPilaresCards(data) {
           <span style="font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:${p.color};">${p.nome}</span>
         </div>
         <div style="display:flex;align-items:center;gap:16px;">
-          <span style="font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;">${pctPilar}% das saídas</span>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
+            <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;">${pctPilar}% das saídas</span>
+            <span style="font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;opacity:.65;white-space:nowrap;">${pctRend}% do rendimento</span>
+          </div>
           <span style="font-size:1.2rem;font-weight:800;font-family:'DM Mono',monospace;">-${fmtAbs(total)}</span>
         </div>
       </div>
