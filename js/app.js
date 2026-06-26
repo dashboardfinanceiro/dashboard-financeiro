@@ -2,6 +2,7 @@
 import * as State from './state.js';
 import { autoCategory, applyRules, fmt, fmtAbs, parseCSV } from './categorize.js';
 import * as Storage from './storage.js';
+import { initObjetivos, refreshObjetivos } from './objetivos.js';
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 function filterByType(data, type) {
@@ -815,6 +816,7 @@ function refresh() {
   if (budgetPainel && !budgetPainel.classList.contains('hidden')) {
     updateRendimentoLabel(); renderBudgetCats(); updateBudgetOverview();
   }
+  refreshObjetivos();
 }
 
 function showDash(label, detail, isBankFmt) {
@@ -937,6 +939,7 @@ window._gSignOut    = () => Storage.gSignOut({ updateSessionUI: Storage.updateSe
 // ─── Init ─────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
   refreshCatSelects();
+  initObjetivos();
 
   // Tabs tipo
   document.querySelectorAll('.tab[data-t]').forEach(btn => {
