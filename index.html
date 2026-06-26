@@ -26,6 +26,12 @@
 <header>
   <h1>💳 Dashboard Financeiro</h1>
   <div style="display:flex;align-items:center;gap:10px;">
+    <button id="objetivosBtn" onclick="window._toggleObjetivos()"
+      style="display:none;font-size:12px;padding:5px 13px;border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;background:rgba(255,255,255,0.12);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;align-items:center;gap:5px;transition:background 0.15s;"
+      onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+      🎯 Objetivos
+    </button>
     <span id="savedPill" class="hidden" style="font-size:11px;opacity:.7;font-family:'DM Mono',monospace;">dados guardados</span>
     <span id="drivePill" class="hidden g-drive-pill"></span>
     <button id="driveSaveBtn" onclick="window._forceDriveSave()" class="hidden" style="font-size:12px;padding:5px 12px;border:1.5px solid rgba(255,255,255,0.4);border-radius:6px;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Guardar</button>
@@ -279,5 +285,48 @@
 </div>
 
 <script type="module" src="js/app.js"></script>
+
+<!-- ── Widget Objetivos ── -->
+<div id="objetivosOverlay" class="obj-overlay hidden" onclick="window._closeObjetivos()"></div>
+
+<div id="objetivosDrawer" class="obj-drawer">
+  <div class="obj-header">
+    <div>
+      <div class="obj-title">🎯 Objetivos financeiros</div>
+      <div class="obj-subtitle">Escolhe o teu perfil e vê o diagnóstico</div>
+    </div>
+    <button class="obj-close-btn" onclick="window._closeObjetivos()" title="Fechar">×</button>
+  </div>
+  <div class="obj-body">
+    <div class="obj-section-label">Perfil financeiro</div>
+    <div id="objPerfisList">
+      <button class="obj-perfil-btn" data-perfil="equilibrio" onclick="window._selectPerfil('equilibrio')">
+        <div class="obj-perfil-name">⚖️ Equilíbrio</div>
+        <div class="obj-perfil-pct">50% essenciais · 30% lazer · 20% poupança</div>
+      </button>
+      <button class="obj-perfil-btn" data-perfil="base" onclick="window._selectPerfil('base')">
+        <div class="obj-perfil-name">🧱 Base sólida</div>
+        <div class="obj-perfil-pct">60% essenciais · 20% lazer · 20% poupança</div>
+      </button>
+      <button class="obj-perfil-btn" data-perfil="realista" onclick="window._selectPerfil('realista')">
+        <div class="obj-perfil-name">💪 Realista</div>
+        <div class="obj-perfil-pct">70% essenciais · 20% lazer · 10% poupança</div>
+      </button>
+      <button class="obj-perfil-btn" data-perfil="riqueza" onclick="window._selectPerfil('riqueza')">
+        <div class="obj-perfil-name">🚀 Construir riqueza</div>
+        <div class="obj-perfil-pct">50% essenciais · 20% lazer · 30% poupança</div>
+      </button>
+    </div>
+    <div id="objDiagnostico" class="hidden">
+      <div class="obj-section-label" style="margin-top:1.25rem;">Diagnóstico</div>
+      <div id="objMesLabel" class="obj-mes-label"></div>
+      <div id="objDiagRows"></div>
+      <div id="objConselhos"></div>
+    </div>
+    <div id="objEmpty" class="obj-empty">
+      <p>Carrega um extrato para veres o diagnóstico.</p>
+    </div>
+  </div>
+</div>
 </body>
 </html>

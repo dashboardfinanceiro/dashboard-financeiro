@@ -571,3 +571,106 @@ tr:hover td { background: var(--surface2); }
 .info-tip:focus .info-tip-bubble { display: block; }
 .info-tip-bubble .tip-row { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
 .info-tip-bubble .tip-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; flex-shrink: 0; }
+
+/* ─── Widget Objetivos ──────────────────────────────────────────────────────── */
+
+.obj-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20,18,14,0.35);
+  z-index: 200;
+  transition: opacity 0.25s;
+}
+.obj-overlay.hidden { display: none; }
+
+.obj-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 320px;
+  max-width: 92vw;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+}
+.obj-drawer.open { transform: translateX(0); }
+
+.obj-header {
+  padding: 1.1rem 1.25rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.obj-title { font-size: 14px; font-weight: 500; color: var(--text); }
+.obj-subtitle { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.obj-close-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--muted); font-size: 20px; line-height: 1;
+  padding: 0 4px; flex-shrink: 0; transition: color 0.15s;
+}
+.obj-close-btn:hover { color: var(--text); }
+
+.obj-body { flex: 1; overflow-y: auto; padding: 1rem 1.25rem 1.5rem; }
+
+.obj-section-label {
+  font-size: 10px; font-weight: 500; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+}
+
+.obj-perfil-btn {
+  width: 100%; text-align: left; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface2); margin-bottom: 6px;
+  cursor: pointer; transition: border-color 0.15s, background 0.15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.obj-perfil-btn:hover { background: var(--surface); border-color: var(--blue); }
+.obj-perfil-btn.active { border: 1.5px solid var(--blue); background: #e8f0fb; }
+.obj-perfil-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.obj-perfil-pct { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 2px; }
+
+.obj-mes-label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; margin-bottom: 10px; }
+
+.obj-diag-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  background: var(--surface2); margin-bottom: 6px;
+}
+.obj-diag-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.obj-diag-info { flex: 1; min-width: 0; }
+.obj-diag-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.obj-diag-sub { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+.obj-diag-delta { font-size: 12px; font-weight: 500; font-family: 'DM Mono', monospace; flex-shrink: 0; }
+
+.obj-diag-bar-wrap {
+  height: 4px; background: var(--border); border-radius: 3px;
+  margin-top: 5px; overflow: hidden; position: relative;
+}
+.obj-diag-bar-atual { height: 4px; border-radius: 3px; transition: width 0.4s ease; }
+.obj-diag-bar-target {
+  position: absolute; top: 0; height: 4px; width: 2px;
+  background: var(--text); opacity: 0.35;
+}
+
+.obj-conselhos-box {
+  background: #e8f0fb; border: 1px solid #c5d8f5;
+  border-radius: 8px; padding: 10px 12px; margin-top: 10px;
+}
+.obj-conselhos-title { font-size: 11px; font-weight: 500; color: var(--blue); margin-bottom: 6px; }
+.obj-conselho-item {
+  font-size: 11px; color: #1a3560; line-height: 1.55;
+  padding: 4px 0; border-bottom: 1px solid #c5d8f520;
+  display: flex; align-items: flex-start; gap: 6px;
+}
+.obj-conselho-item:last-child { border-bottom: none; }
+
+.obj-empty { text-align: center; padding: 2rem 1rem; color: var(--muted); font-size: 12px; font-family: 'DM Mono', monospace; }
