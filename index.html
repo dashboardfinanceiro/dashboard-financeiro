@@ -26,6 +26,12 @@
 <header>
   <h1>💳 Dashboard Financeiro</h1>
   <div style="display:flex;align-items:center;gap:10px;">
+    <button id="regrasBtn" onclick="window._toggleRegras()"
+      style="font-size:12px;padding:5px 13px;border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;background:rgba(255,255,255,0.12);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;display:flex;align-items:center;gap:5px;transition:background 0.15s;"
+      onmouseover="this.style.background='rgba(255,255,255,0.22)'"
+      onmouseout="this.style.background='rgba(255,255,255,0.12)'">
+      ⚙️ Regras
+    </button>
     <button id="objetivosBtn" onclick="window._toggleObjetivos()"
       style="font-size:12px;padding:5px 13px;border:1.5px solid rgba(255,255,255,0.4);border-radius:20px;background:rgba(255,255,255,0.12);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:500;display:flex;align-items:center;gap:5px;transition:background 0.15s;"
       onmouseover="this.style.background='rgba(255,255,255,0.22)'"
@@ -187,13 +193,14 @@
       <button class="tab active" data-t="all">Todos</button>
       <button class="tab" data-t="in">Entradas</button>
       <button class="tab" data-t="out">Saídas</button>
-      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
-        <button class="btn" style="font-size:12px;padding:6px 12px;" onclick="window._toggleRegras()">⚙️ Regras</button>
-        <button class="btn" style="font-size:12px;padding:6px 12px;" onclick="window._toggleAddMov()" id="addMovToggleBtn">+ Adicionar movimento</button>
-        <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
-          <strong>+ Adicionar movimento</strong> — cria uma linha manual, útil para corrigir situações que o extrato do banco não reflete bem (ex: um reembolso que cobre despesas de meses diferentes). Valor positivo = entrada, negativo = saída.<br/><br/>
-          <strong>🗑 na tabela</strong> — apaga esse movimento. Não pode ser desfeito.
-        </span></span>
+      <div style="margin-left:auto;display:flex;align-items:center;">
+        <div style="display:flex;align-items:center;">
+          <button class="btn" style="font-size:12px;padding:6px 12px;" onclick="window._toggleAddMov()" id="addMovToggleBtn">+ Adicionar movimento</button>
+          <span class="info-tip" tabindex="0">i<span class="info-tip-bubble">
+            <strong>+ Adicionar movimento</strong> — cria uma linha manual, útil para corrigir situações que o extrato do banco não reflete bem (ex: um reembolso que cobre despesas de meses diferentes). Valor positivo = entrada, negativo = saída.<br/><br/>
+            <strong>🗑 na tabela</strong> — apaga esse movimento. Não pode ser desfeito.
+          </span></span>
+        </div>
       </div>
     </div>
     <div id="addMovPanel" class="hidden" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:1rem;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;">
