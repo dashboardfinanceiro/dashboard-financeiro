@@ -254,29 +254,61 @@ function _renderDiagnostico() {
     { id: 'poupanca',   label: '💰 Poupança',   alvo: perfil.poupanca,   cor: '#1D9E75' }
   ];
 
-  rowsEl.innerHTML = slots.map(slot => {
-    const atual   = pcts[slot.id];
-    const delta   = atual - slot.alvo;
-    const ok      = Math.abs(delta) <= 3; // tolerância de 3%
-    const acima   = delta > 3;
-    const dotCor  = ok ? '#1D9E75' : acima ? '#D85A30' : '#BA7517';
-    const deltaTxt = (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
-    const deltaCor = ok ? '#1D9E75' : acima ? '#D85A30' : '#BA7517';
-    // barra: atual vs alvo
-    const barPct    = Math.min(atual, 100);
-    const targetPct = Math.min(slot.alvo, 100);
+  const fmtVal = v => v.toLocaleString('pt-PT', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
 
-    return `<div class="obj-diag-row">
-      <div class="obj-diag-dot" style="background:${dotCor};"></div>
-      <div class="obj-diag-info">
-        <div class="obj-diag-label">${slot.label}</div>
-        <div class="obj-diag-sub">objetivo ${slot.alvo}% · atual ${atual.toFixed(1)}% · ${fmtAbs(porPilar[slot.id] || 0)}</div>
-        <div class="obj-diag-bar-wrap">
+  rowsEl.innerHTML = slots.map(slot => {
+    const atual      = pcts[slot.id];
+    const delta      = atual - slot.alvo;
+    const ok         = Math.abs(delta) <= 3;
+    const acima      = delta > 3;
+    const dotCor     = ok ? '#1D9E75' : acima ? '#D85A30' : '#BA7517';
+    const deltaTxt   = (delta > 0 ? '+' : '') + delta.toFixed(1) + '%';
+    const deltaCor   = ok ? '#1D9E75' : acima ? '#D85A30' : '#BA7517';
+    const barPct     = Math.min(atual, 100);
+    const targetPct  = Math.min(slot.alvo, 100);
+
+    // Valores em € do objetivo e do atual
+    const alvoEur  = totalRend > 0 ? totalRend * (slot.alvo / 100) : 0;
+    const atualEur = porPilar[slot.id] || 0;
+    const difEur   = atualEur - alvoEur;
+    const difTxt   = (difEur > 0 ? '+' : '') + fmtVal(Math.abs(difEur));
+    const difLabel = difEur > 0.5 ? 'acima' : difEur < -0.5 ? 'abaixo' : 'no objetivo';
+
+    return `<div class="obj-diag-row" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="obj-diag-dot" style="background:${dotCor};flex-shrink:0;"></div>
+        <div style="flex:1;min-width:0;">
+          <div class="obj-diag-label">${slot.label}</div>
+        </div>
+        <div class="obj-diag-delta" style="color:${deltaCor};font-size:13px;">${deltaTxt}</div>
+      </div>
+
+      <!-- Linha de valores -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-left:19px;">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Objetivo</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:var(--text);">${fmtVal(alvoEur)}</div>
+          <div style="font-size:10px;color:var(--muted);">${slot.alvo}% do rendimento</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Atual</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${dotCor};">${fmtVal(atualEur)}</div>
+          <div style="font-size:10px;color:var(--muted);">${atual.toFixed(1)}% do rendimento</div>
+        </div>
+        <div style="background:${ok ? '#f0faf5' : acima ? '#fff5f0' : '#fffbf0'};border:1px solid ${ok ? '#b8e8d4' : acima ? '#f5c4b0' : '#f0dfa0'};border-radius:8px;padding:7px 10px;">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Diferença</div>
+          <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:${deltaCor};">${difEur > 0.5 ? '+' : difEur < -0.5 ? '-' : ''}${fmtVal(Math.abs(difEur))}</div>
+          <div style="font-size:10px;color:${deltaCor};">${difLabel}</div>
+        </div>
+      </div>
+
+      <!-- Barra -->
+      <div style="margin-left:19px;">
+        <div class="obj-diag-bar-wrap" style="height:5px;">
           <div class="obj-diag-bar-atual" style="width:${barPct}%;background:${dotCor};"></div>
           <div class="obj-diag-bar-target" style="left:${targetPct}%;"></div>
         </div>
       </div>
-      <div class="obj-diag-delta" style="color:${deltaCor};">${deltaTxt}</div>
     </div>`;
   }).join('');
 
