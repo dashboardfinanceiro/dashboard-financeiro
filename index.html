@@ -52,37 +52,48 @@
 <div class="container">
 
   <!-- Upload -->
-  <div class="upload-card">
-    <p class="upload-label">Carregar extratos bancários</p>
-    <div id="noSessionWarning" style="display:none;background:#fff8e1;border:1.5px solid #ffe082;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7a5c00;display:flex;align-items:center;gap:8px;">
-      ⚠️ <span>Para guardar automaticamente na tua conta Google, <strong>faz login primeiro</strong> antes de carregar o extrato.</span>
+  <div class="upload-card" id="uploadCard">
+
+    <!-- Vista compacta (após carregar dados) -->
+    <div id="uploadCompact" class="hidden" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;">Extratos</span>
+      <div id="monthsChips" style="display:flex;flex-wrap:wrap;gap:6px;flex:1;"></div>
+      <span id="fileInfoText" style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap;"></span>
+      <button class="btn btn-accent" onclick="document.getElementById('fileInput').click()" style="font-size:12px;padding:6px 14px;white-space:nowrap;">+ Extrato</button>
+      <button class="btn btn-danger" id="clearBtn" style="font-size:12px;padding:6px 14px;white-space:nowrap;">Limpar</button>
+      <input type="file" id="fileInput" accept=".csv,.txt" multiple style="display:none;"/>
     </div>
-    <div class="upload-row">
-      <div class="drop-area" id="dropZone">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
-        <div>
-          <p><strong>Arrasta o extrato aqui</strong> ou clica para escolher</p>
-          <p>Cada ficheiro adiciona um mês — podes carregar vários</p>
+
+    <!-- Vista expandida (estado inicial) -->
+    <div id="uploadExpanded">
+      <p class="upload-label">Carregar extratos bancários</p>
+      <div id="noSessionWarning" style="display:none;background:#fff8e1;border:1.5px solid #ffe082;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#7a5c00;display:flex;align-items:center;gap:8px;">
+        ⚠️ <span>Para guardar automaticamente na tua conta Google, <strong>faz login primeiro</strong> antes de carregar o extrato.</span>
+      </div>
+      <div class="upload-row">
+        <div class="drop-area" id="dropZone">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+          <div>
+            <p><strong>Arrasta o extrato aqui</strong> ou clica para escolher</p>
+            <p>Cada ficheiro adiciona um mês — podes carregar vários</p>
+          </div>
+          <input type="file" id="fileInputExpanded" accept=".csv,.txt" multiple/>
         </div>
-        <input type="file" id="fileInput" accept=".csv,.txt" multiple/>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-accent" onclick="document.getElementById('fileInputExpanded').click()">+ Adicionar extrato</button>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        <button class="btn btn-accent" onclick="document.getElementById('fileInput').click()">+ Adicionar extrato</button>
-        <button class="btn btn-danger hidden" id="clearBtn">Limpar tudo</button>
-      </div>
-    </div>
-    <div style="margin-top:1rem;" id="hintBox">
-      <div class="hint">
-        <div class="hint-format">✅ <strong>Formato banco suportado</strong> (CGD, BPI, Novo Banco, Santander, etc.)</div>
-        <div>Data mov. ; Data valor ; Descrição ; Débito ; Crédito ; Saldo contabilístico ; Saldo disponível ; Categoria</div>
-        <div style="margin-top:6px; opacity:0.7">30-04-2026 ; 30-04-2026 ; TRF CXDAPP ;  ; 500,00 ; 741,41 ; 720,51 ; Diversos</div>
-        <div style="margin-top:8px; border-top:1px solid var(--border); padding-top:8px; opacity:0.7">✅ Também suporta formato simples: <strong>data ; descrição ; valor</strong></div>
+      <div style="margin-top:1rem;" id="hintBox">
+        <div class="hint">
+          <div class="hint-format">✅ <strong>Formato banco suportado</strong> (CGD, BPI, Novo Banco, Santander, etc.)</div>
+          <div>Data mov. ; Data valor ; Descrição ; Débito ; Crédito ; Saldo contabilístico ; Saldo disponível ; Categoria</div>
+          <div style="margin-top:6px; opacity:0.7">30-04-2026 ; 30-04-2026 ; TRF CXDAPP ;  ; 500,00 ; 741,41 ; 720,51 ; Diversos</div>
+          <div style="margin-top:8px; border-top:1px solid var(--border); padding-top:8px; opacity:0.7">✅ Também suporta formato simples: <strong>data ; descrição ; valor</strong></div>
+        </div>
       </div>
     </div>
-    <div id="monthsList" class="hidden" style="margin-top:0.75rem;">
-      <div id="monthsChips" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
-    </div>
-    <div id="fileInfo" class="hidden"><span id="fileInfoText" style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;"></span></div>
+
+    <div id="fileInfo" class="hidden"></div>
   </div>
 
   <!-- Filtro de meses (afeta tudo abaixo) -->
