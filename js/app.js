@@ -561,9 +561,12 @@ function reapplyCategories() {
   refresh();
 }
 
+// ─── Pilares Config (continuação) ────────────────────────────────────────────
+
 window._toggleRegras = function() {
   const drawer  = document.getElementById('regrasDrawer');
   const overlay = document.getElementById('regrasOverlay');
+  if (!drawer) return;
   if (drawer.classList.contains('open')) {
     drawer.classList.remove('open');
     overlay.classList.add('hidden');
@@ -576,8 +579,11 @@ window._toggleRegras = function() {
 };
 
 window._closeRegras = function() {
-  document.getElementById('regrasDrawer').classList.remove('open');
-  document.getElementById('regrasOverlay').classList.add('hidden');
+  const drawer  = document.getElementById('regrasDrawer');
+  const overlay = document.getElementById('regrasOverlay');
+  if (!drawer) return;
+  drawer.classList.remove('open');
+  overlay.classList.add('hidden');
 };
 
 // ─── Pilares Config ───────────────────────────────────────────────────────────
