@@ -562,11 +562,22 @@ function reapplyCategories() {
 }
 
 window._toggleRegras = function() {
-  const p = document.getElementById('regrasPainel');
-  const btn = document.getElementById('regrasToggleBtn');
-  const hidden = p.classList.toggle('hidden');
-  btn.textContent = hidden ? 'Mostrar regras' : 'Esconder regras';
-  if (!hidden) renderCatChips();
+  const drawer  = document.getElementById('regrasDrawer');
+  const overlay = document.getElementById('regrasOverlay');
+  if (drawer.classList.contains('open')) {
+    drawer.classList.remove('open');
+    overlay.classList.add('hidden');
+  } else {
+    overlay.classList.remove('hidden');
+    requestAnimationFrame(() => drawer.classList.add('open'));
+    renderRulesList();
+    renderCatChips();
+  }
+};
+
+window._closeRegras = function() {
+  document.getElementById('regrasDrawer').classList.remove('open');
+  document.getElementById('regrasOverlay').classList.add('hidden');
 };
 
 // ─── Pilares Config ───────────────────────────────────────────────────────────
