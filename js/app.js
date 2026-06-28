@@ -276,7 +276,7 @@ function renderResumo(data) {
   const saiMax   = saiKeys.length ? saiCats[saiKeys[0]].total : 1;
   const saiTotal = saiKeys.reduce((s,k) => s + saiCats[k].total, 0);
   const saiBody  = document.getElementById('resumoSaiBody');
-  if (saiBody) {
+  if (false && saiBody) {
     saiBody.innerHTML = !saiKeys.length
       ? '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:1.5rem;font-size:12px;">Sem despesas</td></tr>'
       : buildResumoRows(saiCats, saiKeys, saiMax, true)
