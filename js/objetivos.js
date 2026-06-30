@@ -51,7 +51,10 @@ function _openDrawer(drawer, overlay) {
   overlay.classList.remove('hidden');
   // pequeno delay para a transição CSS funcionar
   requestAnimationFrame(() => drawer.classList.add('open'));
-  refreshObjetivos();
+  // Renderizar diretamente (não usar refreshObjetivos aqui: nesta altura a
+  // classe 'open' ainda não foi aplicada, por isso essa função não atualizaria nada)
+  _updateBotaoVisivel();
+  _renderDiagnostico();
 }
 
 function _closeDrawer(drawer, overlay) {
@@ -273,6 +276,7 @@ function _renderDiagnostico() {
     const difEur   = atualEur - alvoEur;
     const difTxt   = (difEur > 0 ? '+' : '') + fmtVal(Math.abs(difEur));
     const difLabel = difEur > 0.5 ? 'acima' : difEur < -0.5 ? 'abaixo' : 'no objetivo';
+    const pctDoObjetivo = alvoEur > 0 ? (atualEur / alvoEur) * 100 : 0;
 
     return `<div class="obj-diag-row" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px;">
       <div style="display:flex;align-items:center;gap:10px;">
@@ -291,9 +295,9 @@ function _renderDiagnostico() {
           <div style="font-size:10px;color:var(--muted);">${slot.alvo}% do rendimento</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:7px 10px;">
-          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Atual</div>
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Gasto real</div>
           <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${dotCor};">${fmtVal(atualEur)}</div>
-          <div style="font-size:10px;color:var(--muted);">${atual.toFixed(1)}% do rendimento</div>
+          <div style="font-size:10px;color:var(--muted);">${pctDoObjetivo.toFixed(0)}% do objetivo</div>
         </div>
         <div style="background:${ok ? '#f0faf5' : acima ? '#fff5f0' : '#fffbf0'};border:1px solid ${ok ? '#b8e8d4' : acima ? '#f5c4b0' : '#f0dfa0'};border-radius:8px;padding:7px 10px;">
           <div style="font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:2px;">Diferença</div>
