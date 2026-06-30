@@ -58,25 +58,6 @@ header h1 { font-size: 1.25rem !important; letter-spacing: 0.02em; }
   color: #fff;
   border-color: rgba(255,255,255,0.32);
 }
-.hbtn-invest {
-  font-size: 12px; padding: 6px 15px;
-  border-radius: 20px;
-  background: rgba(96,190,230,0.16);
-  border: 1.5px solid rgba(96,190,230,0.5);
-  color: #a8dff5;
-  cursor: pointer;
-  font-family: 'DM Sans', sans-serif; font-weight: 600;
-  display: flex; align-items: center; gap: 6px;
-  transition: background 0.15s, color 0.15s, border-color 0.15s, box-shadow 0.15s;
-  text-decoration: none;
-  letter-spacing: 0.01em;
-}
-.hbtn-invest:hover {
-  background: rgba(96,190,230,0.28);
-  border-color: rgba(96,190,230,0.8);
-  color: #d6f0fb;
-  box-shadow: 0 0 12px rgba(96,190,230,0.2);
-}
 .hbtn-sep {
   width: 1px; height: 18px;
   background: rgba(255,255,255,0.15);
@@ -90,7 +71,6 @@ header h1 { font-size: 1.25rem !important; letter-spacing: 0.02em; }
     <button id="regrasBtn" onclick="window._toggleRegras()" class="hbtn-nav">⚙️ Regras</button>
     <button id="objetivosBtn" onclick="window._toggleObjetivos()" class="hbtn-nav">🎯 Objetivos</button>
     <div class="hbtn-sep"></div>
-    <a href="investimentos.html" class="hbtn-invest">📈 Investimentos & Poupanças</a>
     <span id="savedPill" class="hidden" style="font-size:11px;opacity:.6;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.7);margin-left:4px;">dados guardados</span>
     <span id="drivePill" class="hidden g-drive-pill"></span>
     <button id="driveSaveBtn" onclick="window._forceDriveSave()" class="hidden" style="font-size:12px;padding:5px 12px;border:1.5px solid rgba(255,255,255,0.25);border-radius:6px;background:rgba(255,255,255,0.1);color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;">💾 Guardar</button>
