@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dashboard Financeiro</title>
+<title>Dashboard Financeiro — AFOI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -17,7 +17,7 @@
   <div class="g-signin-box">
     <div id="gSigninContent">
       <div style="font-size:2.8rem;margin-bottom:1rem;">💳</div>
-      <h2>Dashboard Financeiro</h2>
+      <h2>Dashboard Financeiro — AFOI</h2>
       <p>Entra com a tua conta Google para guardares os teus dados em segurança no Google Drive.</p>
       <div id="gSigninBtn" style="display:flex;justify-content:center;"></div>
       <p style="font-size:11px;color:var(--muted);margin-top:1.2rem;opacity:.6;">Os teus dados ficam privados no teu Google Drive.</p>
@@ -35,7 +35,7 @@
 
 <style>
 header {
-  background: linear-gradient(135deg, #0f2d1f 0%, #1a4a2e 60%, #1e5c38 100%) !important;
+  background: linear-gradient(135deg, #1a4d2e 0%, #256b3f 60%, #2d7d4a 100%) !important;
   border-bottom: 1px solid rgba(255,255,255,0.07);
   box-shadow: 0 2px 16px rgba(0,0,0,0.18);
   padding: 0.9rem 2rem !important;
@@ -58,6 +58,38 @@ header h1 { font-size: 1.25rem !important; letter-spacing: 0.02em; }
   color: #fff;
   border-color: rgba(255,255,255,0.32);
 }
+.hbtn-regras {
+  font-size: 13px; padding: 6px 15px;
+  border: 1.5px solid rgba(255,160,60,0.55);
+  border-radius: 20px;
+  background: rgba(255,140,30,0.15);
+  color: #ffbe7a;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.hbtn-regras:hover {
+  background: rgba(255,140,30,0.28);
+  border-color: rgba(255,160,60,0.85);
+  color: #ffd4a0;
+}
+.hbtn-objetivos {
+  font-size: 13px; padding: 6px 15px;
+  border: 1.5px solid rgba(255,160,60,0.55);
+  border-radius: 20px;
+  background: rgba(255,140,30,0.15);
+  color: #ffbe7a;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.hbtn-objetivos:hover {
+  background: rgba(255,140,30,0.28);
+  border-color: rgba(255,160,60,0.85);
+  color: #ffd4a0;
+}
 .hbtn-sep {
   width: 1px; height: 18px;
   background: rgba(255,255,255,0.15);
@@ -66,10 +98,10 @@ header h1 { font-size: 1.25rem !important; letter-spacing: 0.02em; }
 </style>
 
 <header>
-  <h1>💳 Dashboard Financeiro</h1>
+  <h1>💳 Dashboard Financeiro — AFOI</h1>
   <div style="display:flex;align-items:center;gap:8px;">
-    <button id="regrasBtn" onclick="window._toggleRegras()" class="hbtn-nav">⚙️ Regras</button>
-    <button id="objetivosBtn" onclick="window._toggleObjetivos()" class="hbtn-nav">🎯 Objetivos</button>
+    <button id="regrasBtn" onclick="window._toggleRegras()" class="hbtn-regras">⚙️ Regras e Gestão de Categorias</button>
+    <button id="objetivosBtn" onclick="window._toggleObjetivos()" class="hbtn-objetivos">🎯 Objetivos</button>
     <div class="hbtn-sep"></div>
     <span id="savedPill" class="hidden" style="font-size:11px;opacity:.6;font-family:'DM Mono',monospace;color:rgba(255,255,255,0.7);margin-left:4px;">dados guardados</span>
     <span id="drivePill" class="hidden g-drive-pill"></span>
