@@ -25,6 +25,12 @@
 <style>
   /* Esconde toda a página (exceto o ecrã de login) até haver autenticação */
   body:not(.authed) > *:not(#authGate) { display: none !important; }
+  /* Corrige bug conhecido do netlify-identity-widget: o iframe do modal
+     abre com z-index baixo e fica escondido atrás de overlays da própria página. */
+  iframe[id^="netlify-identity-widget"],
+  .netlify-identity-widget-iframe {
+    z-index: 999999 !important;
+  }
 </style>
 <script>
 (function () {
@@ -68,6 +74,18 @@
   });
 
   window.netlifyIdentity.init();
+
+  // Reforço extra: garante que o iframe do modal fica sempre por cima do authGate,
+  // mesmo que o CSS acima não consiga (ex: se o widget reaplicar o z-index inline).
+  var fixIframeZIndex = function () {
+    var frame = document.getElementById('netlify-identity-widget');
+    if (frame) {
+      frame.style.setProperty('z-index', '999999', 'important');
+    }
+  };
+  var observer = new MutationObserver(fixIframeZIndex);
+  observer.observe(document.body, { childList: true });
+  loginBtn.addEventListener('click', fixIframeZIndex);
 })();
 </script>
 
