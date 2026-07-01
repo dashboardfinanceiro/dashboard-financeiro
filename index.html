@@ -8,9 +8,45 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+
+<!-- Netlify Identity — ecrã de acesso restrito -->
+<div id="authGate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#1a4d2e 0%,#256b3f 60%,#2d7d4a 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-family:'DM Sans',sans-serif;text-align:center;padding:1.5rem;">
+  <div>
+    <div style="font-size:2.8rem;margin-bottom:1rem;">🔒</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-weight:400;margin-bottom:0.5rem;">Dashboard Financeiro — AFOI</h2>
+    <p style="opacity:.75;margin-bottom:1.5rem;font-size:14px;">Faz login para continuares.</p>
+    <button id="authLoginBtn" style="padding:10px 24px;border-radius:20px;border:none;background:#fff;color:#1a4d2e;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;font-size:14px;">Entrar</button>
+  </div>
+</div>
+<style>
+  /* Esconde toda a página (exceto o ecrã de login) até haver autenticação */
+  body:not(.authed) > *:not(#authGate) { display: none !important; }
+</style>
+<script>
+  document.getElementById('authLoginBtn').addEventListener('click', function () {
+    window.netlifyIdentity.open('login');
+  });
+  window.netlifyIdentity.on('init', function (user) {
+    if (user) {
+      document.body.classList.add('authed');
+      document.getElementById('authGate').style.display = 'none';
+    }
+  });
+  window.netlifyIdentity.on('login', function () {
+    document.body.classList.add('authed');
+    document.getElementById('authGate').style.display = 'none';
+    window.netlifyIdentity.close();
+  });
+  window.netlifyIdentity.on('logout', function () {
+    document.body.classList.remove('authed');
+    document.getElementById('authGate').style.display = 'flex';
+  });
+  window.netlifyIdentity.init();
+</script>
 
 <!-- Google Sign-In overlay -->
 <div class="g-signin-overlay" id="gSigninOverlay">
